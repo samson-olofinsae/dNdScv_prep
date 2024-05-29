@@ -4,7 +4,7 @@ Consequently, the development of suites of bioinformatics pipeline toward detect
 
 Variant calling (and clinical annotation/prediction of variant effects) is an essential downstream analysis in Next Generation Sequencing analysis. Filtering variants in sequenced DNA samples is an essential process towards determining variations in the samples relative to the reference sequence. While typically written in bash script, the pipeline script in this repo is coded in Python (filename: mutation-caller.py), which is the chosen programming language for this pipeline because of its powerful functionalities that enable developers to track bugs, unit-test codes, build control and automation. The pipeline employs an inital software-like user friendly interface which checks that the right file naming convention compatible with the pipeline is used by the user. Acceptable fastq file naming is : sample_(R1,R2)* where R1 and R2 denotes forward and reverse read, respectively. An unzipped reference genome file is also recommended. 
 
-The pipeline uses the following python modules for its processing: pandas, os, glob, rpy2, os.path and subprocess ( importing call). The pipeline is able to process multiple samples (HPC server recommended).
+The pipeline uses the following python modules for its processing: pandas, os, matplotlib, altair, glob, rpy2, os.path and subprocess ( importing call). The pipeline is able to process multiple samples (HPC server recommended).
 
 The pipeline generates outputs in the user's working directory using the following folder and file structure (aslo attached as filename: Folder_structure.txt):
 
