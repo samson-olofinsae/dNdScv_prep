@@ -14,7 +14,7 @@ From input fastq files, the pipeline generates VCF files, and also filters the f
 
 The downnstream processing of the pipeline will generate user-friendly visual correlations between genes, mutations and clinical effects. This seamless approach can guide research-driven clinical diagnosis. 
 
-Reference
+References
 
 Martincorena I, Raine KM, Gerstung M, Dawson KJ, Haase K, Van Loo P, Davies H, Stratton MR, Campbell PJ. Universal Patterns of Selection in Cancer and Somatic Tissues. Cell. 2017 Nov 16;171(5):1029-1041.e21. doi: 10.1016/j.cell.2017.09.042. Epub 2017 Oct 19. Erratum in: Cell. 2018 Jun 14;173(7):1823. PMID: 29056346; PMCID: PMC5720395.
 
