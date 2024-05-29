@@ -10,7 +10,9 @@ The pipeline generates outputs in the user's working directory using the followi
 
 results/ ├── bam │   ├── sample.aligned.bam │   ├── sample.aligned.sorted.bam │   └── sample.aligned.sorted.bam.bai ├── bcf │   └── sample_raw.bcf ├── sam │   └── sample.aligned.sam └── vcf ├── sample_variants.vcf ├── indels │   └── samplle_indels.vcf.gz └── snvs └── sample_snvs.vcf.gz
 
-From input fastq files, the pipeline generates VCF files, and also filters the files to seperately generate indels and snv VCFs. VCF file filtering is an essential step added for researh purpose. For instance, concatenation of indels and snvs variants from tumour samples may be used as inputs in the pipeline for generating mutation table used in somatic cancer driver analysis that employs Non Synonymous:Synonymous mutation ratio (Martincorena, et al., 2017)
+From input fastq files, the pipeline generates VCF files, and also filters the files to seperately generate indels and snv VCFs. VCF file filtering is an essential step added for researh purpose. For instance, concatenation of indels and snvs variants from tumour samples may be used as inputs in the pipeline for generating mutation table used in somatic cancer driver analysis that employs Non Synonymous:Synonymous mutation ratio (Martincorena, et al., 2017).
+
+The downnstream processing of the pipeline will generate user-friendly visual correlations between genes, mutations and clinical effects. This seamless approach can guide research-driven clinical diagnosis. 
 
 Reference
 
