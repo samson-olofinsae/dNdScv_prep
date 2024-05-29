@@ -1,0 +1,15 @@
+results/
+├── bam
+│   ├── sample.aligned.bam
+│   ├── sample.aligned.sorted.bam
+│   └── sample.aligned.sorted.bam.bai
+├── bcf
+│   └── sample_raw.bcf
+├── sam
+│   └── sample.aligned.sam
+└── vcf
+    ├── sample_variants.vcf
+    ├── indels
+    │   └── sample_indels.vcf.gz
+    └── snvs
+        └── sample_snvs.vcf.gz
