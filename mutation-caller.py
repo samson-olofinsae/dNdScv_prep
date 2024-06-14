@@ -1,6 +1,5 @@
 ########### This software works with unzipped reference genome file
 
-
 import subprocess
 import pandas as  pd
 import os
@@ -130,6 +129,9 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
        
         df_final=pd.concat(all_samples)
         df_final.to_csv('combined_indels_variants.csv',index=False)
+        dndscv_path = os.path.join (wd, 'results', 'dndscv')
+
+        status = subprocess.run (["cp", "combined_indels_variants.csv", dndscv_path], capture_output=True)
 
             
         # Extracting snvs variants
@@ -156,5 +158,4 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
         df_final=pd.concat(all_samples)
         df_final.to_csv('combined_snv_variants.csv',index=False, header=None)
 
-     
-    
+        status = subprocess.run (["cp", "combined_snv_variants.csv", dndscv_path], capture_output=True)
