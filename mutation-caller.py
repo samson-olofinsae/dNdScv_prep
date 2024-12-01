@@ -116,7 +116,7 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
                 pattern = item.find("_")
 
                 sampleID = item[0:pattern]
-                df_variant=pd.read_csv(item,sep='\t',comment='#',usecols=[0,1,3,4],names=['CHR','POS','REF','ALT'])
+                df_variant=pd.read_csv(item,sep='\t',comment='#',usecols=[0,1,3,4],names=['chr','pos','ref','mut''])
                 sampleids=[sampleID for i in range(df_variant.shape[0])]
                 df_variant.insert(0,'SampleID',sampleids)
                 all_samples.append(df_variant)
@@ -165,5 +165,7 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
         os.chdir(os.path.join (wd, 'results', 'dndscv'))
 
               
-        for command in ("cat combined_indels_variants.csv combined_snv_variants.csv > dndscv.csv",):
-            call(command, shell=True) 
+        for command in ("cat combined_indels_variants.csv combined_snv_variants.csv > dndscv.csv",
+                        "sed 's/,/\t/g' dndscv.csv > file.txt",
+                        "column -t file.txt > dndscv.txt"):
+              call(command, shell=True)  
