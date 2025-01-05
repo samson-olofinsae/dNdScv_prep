@@ -54,7 +54,6 @@ for variant in variant_folder:
 
 os.chdir(wd)
 
-
 for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
     
     file = glob.glob("*R1.fastq.gz")
