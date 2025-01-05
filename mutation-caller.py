@@ -52,7 +52,6 @@ variant_folder = ['indels', 'snvs']
 for variant in variant_folder:
     os.mkdir(variant)
 
-
 os.chdir(wd)
 
 
