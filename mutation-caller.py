@@ -75,7 +75,6 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
         comprssed_indels = os.path.join (wd, 'results', 'vcf', 'indels', f'{base}' + '_indels.vcf.gz') # same name as the uncompressed
         snvs = os.path.join (wd, 'results', 'vcf', 'snvs', f'{base}' + '_snvs.vcf')
         comprssed_snvs = os.path.join (wd, 'results', 'vcf', 'snvs', f'{base}' + '_snvs.vcf.gz')
-
               
         for command in (f"bwa mem {ref_genome_file} {fq1} {fq2} | samtools sort -o {sorted_bam}",
                         f"samtools index -b {sorted_bam}", 
