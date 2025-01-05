@@ -34,7 +34,6 @@ fastq_file_path = os.path.join(wd, '*.fastq.gz')
 
 print (f'Your fastq file path is {fastq_file_path}')
 
-
 # Indexing the reference genome
 
 indexing = subprocess.run (["bwa", "index", ref_genome_file_path], capture_output=True)
