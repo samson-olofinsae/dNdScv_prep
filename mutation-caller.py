@@ -29,7 +29,6 @@ ref_genome_file_path = os.path.join(wd, ref_genome_file)
 
 print (f'Your ref genome file path: {ref_genome_file_path}')
 
-
 fastq_file_path = os.path.join(wd, '*.fastq.gz') 
 
 print (f'Your fastq file path is {fastq_file_path}')
