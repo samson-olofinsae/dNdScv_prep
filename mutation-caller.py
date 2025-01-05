@@ -111,7 +111,6 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
                 all_samples.append(df_variant)
             
                 print(f"Generating indels mutation table from {sampleID}")
-
             
        
         df_final=pd.concat(all_samples)
