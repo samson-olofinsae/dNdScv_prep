@@ -147,7 +147,6 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
         # Generate the dndsvc table
         
         os.chdir(os.path.join (wd, 'results', 'dndscv'))
-
               
         for command in ("cat combined_indels_variants.csv combined_snv_variants.csv > dndscv.csv",
                         "sed 's/,/\t/g' dndscv.csv > file.txt",
