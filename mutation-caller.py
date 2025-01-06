@@ -87,8 +87,7 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
                         f"bcftools view -v snps {compressed_variants} -o {snvs}", 
                         f"bcftools view -Oz -o {comprssed_snvs} {snvs}",
                         f"bcftools view -v indels {compressed_variants} -o {indels}",
-                        f"bcftools view -Oz -o {comprssed_indels} {indels}"):
-              
+                        f"bcftools view -Oz -o {comprssed_indels} {indels}"):              
               
             call(command, shell=True) 
         # Extracting indels variants
