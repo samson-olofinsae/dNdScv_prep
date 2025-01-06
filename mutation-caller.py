@@ -116,7 +116,6 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
         dndscv_path = os.path.join (wd, 'results', 'dndscv')
 
         status = subprocess.run (["cp", "combined_indels_variants.csv", dndscv_path], capture_output=True)
-
             
         # Extracting snvs variants
 
