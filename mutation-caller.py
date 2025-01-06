@@ -95,7 +95,6 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
         #bgzip -c input.vcf > output.vcf.gz
 
         print ("Contructing indels mutation table...") 
-
         
         os.chdir(os.path.join (wd, 'results', 'vcf', 'indels'))
 
