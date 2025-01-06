@@ -145,7 +145,6 @@ for fq1 in os.path.join (wd, '*_R1.fastq.gz'):
         status = subprocess.run (["cp", "combined_snv_variants.csv", dndscv_path], capture_output=True)
 
 
-
         # Generate the dndsvc table
         
         os.chdir(os.path.join (wd, 'results', 'dndscv'))
