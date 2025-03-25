@@ -1,5 +1,4 @@
 ########### This software works with unzipped reference genome file
-
 import subprocess
 import pandas as pd
 import os
