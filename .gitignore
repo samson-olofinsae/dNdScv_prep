@@ -1,0 +1,63 @@
+# === Runtime outputs (do not track) ===
+results*/
+**/bam/
+**/bcf/
+**/vcf/
+**/dndscv/
+**/reports_summary.tsv
+
+# Common genomics artifacts
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bam
+*.bai
+*.cram
+*.crai
+*.vcf
+*.vcf.gz
+*.tbi
+*.csi
+*.bcf
+*.bcf.gz
+
+# Logs / scratch
+*.log
+*.err
+*.out
+*.tmp
+tmp/
+scratch/
+work/
+
+# Python noise
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+venv/
+.env
+.env.*
+
+# Jupyter (if you later add notebooks)
+.ipynb_checkpoints/
+
+# OS / editor
+.DS_Store
+*.swp
+*.swo
+
+# Containers / images / caches
+*.sif
+.singularity/
+.singularity-cache/
+.conda/
+conda-env/
+.mamba/
+.micromamba/
+
+# Docker build context you don't want baked into images
+docker-cache/
