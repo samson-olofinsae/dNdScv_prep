@@ -88,7 +88,8 @@ def discover_r1s_from_source(source: str) -> List[Path]:
 # --------------------------- core runner ---------------------------
 
 def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, ploidy: int,
-                 min_qual: int, min_dp: int, auto_index: bool, assume_yes: bool):
+                 min_qual: int, min_dp: int, auto_index: bool, assume_yes: bool,
+                 run_dndscv: bool=False, assembly: str="auto", refdb_rds: str=None):
 
     # tool checks
     for tool in ["bwa", "samtools", "bcftools", "bgzip", "tabix"]:
@@ -149,6 +150,8 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
         print(f"  Ploidy      : {ploidy}")
         print(f"  Filters     : QUAL>={min_qual}, DP>={min_dp}")
         print(f"  Samples     : {len(r1s)}")
+        if run_dndscv:
+            print(f"  dNdScv      : enabled (assembly={assembly}{', custom refdb' if (assembly=='custom' and refdb_rds) else ''})")
         if not prompt_yn("Proceed with processing?", default="y"):
             sys.exit("Aborted by user.")
 
@@ -252,18 +255,37 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
         summary = pd.concat(summary_rows, ignore_index=True)
         summary.to_csv(outdir/"reports_summary.csv", index=False)
 
+    # ------------------ Optional: run dNdScv R engine ------------------
+    if run_dndscv:
+        rscript = shutil.which("Rscript")
+        if rscript is None:
+            print("[WARN] Rscript not found in PATH. Skipping dNdScv run.")
+        else:
+            cmd = [
+                rscript, "R/run_dndscv.R",
+                "--input", str(dndscv_csv),
+                "--assembly", assembly,
+                "--outdir", str(ddir)
+            ]
+            if assembly == "custom" and refdb_rds:
+                cmd.extend(["--refdb_rds", refdb_rds])
+            print("[info] Running dNdScv via Rscript...")
+            sh(" ".join(shlex.quote(c) for c in cmd))
+
     print("\n Done.")
     print(f"  dNdScv input : {dndscv_csv}")
     print(f"  (optional) SNVs   : {snv_csv}")
     print(f"  (optional) INDELs : {indel_csv}")
     if (outdir/'reports_summary.csv').exists():
         print(f"  Summary      : {outdir/'reports_summary.csv'}")
+    if run_dndscv:
+        print(f"  dNdScv (R)   : outputs in {ddir} (e.g., globaldnds.csv, sel_cv.csv, genesmuts.csv, dndscv_plots.pdf)")
 
 # --------------------------- entrypoint ---------------------------
 
 def build_parser():
     p = argparse.ArgumentParser(
-        description="Interactive or non-interactive FASTQ→BAM→VCF→dNdScv-table generator (prep only)"
+        description="Interactive or non-interactive FASTQ→BAM→VCF→dNdScv-table generator (+ optional dNdScv R analysis)"
     )
     # mode
     p.add_argument("--non-interactive", action="store_true",
@@ -284,6 +306,15 @@ def build_parser():
     p.add_argument("--min-dp",   type=int, default=10, help="Min DP (default: 10)")
     p.add_argument("--auto-index", action="store_true",
                    help="Auto-generate bwa/samtools indexes if missing, without prompt.")
+
+    # dNdScv (R) optional step
+    p.add_argument("--run-dndscv", action="store_true",
+                   help="After building CSV, run the R dNdScv engine.")
+    p.add_argument("--assembly", choices=["hg19","hg38","auto","custom"], default="auto",
+                   help="Assembly for dNdScv refdb (default: auto). If 'custom', also pass --refdb-rds.")
+    p.add_argument("--refdb-rds", default=None,
+                   help="Path to custom refdb RDS (used only if --assembly=custom).")
+
     return p
 
 def main():
@@ -305,7 +336,10 @@ def main():
             min_qual=args.min_qual,
             min_dp=args.min_dp,
             auto_index=args.auto_index,
-            assume_yes=True  # never prompt in non-interactive
+            assume_yes=True,  # never prompt in non-interactive
+            run_dndscv=args.run_dndscv,
+            assembly=args.assembly,
+            refdb_rds=args.refdb_rds
         )
         return
 
@@ -343,7 +377,10 @@ def main():
         min_qual=args.min_qual,
         min_dp=args.min_dp,
         auto_index=args.auto_index,
-        assume_yes=args.assume_yes
+        assume_yes=args.assume_yes,
+        run_dndscv=args.run_dndscv,
+        assembly=args.assembly,
+        refdb_rds=args.refdb_rds
     )
 
 if __name__ == "__main__":
