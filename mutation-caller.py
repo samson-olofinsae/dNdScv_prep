@@ -252,7 +252,7 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
         summary = pd.concat(summary_rows, ignore_index=True)
         summary.to_csv(outdir/"reports_summary.csv", index=False)
 
-    print("\n✅ Done.")
+    print("\n Done.")
     print(f"  dNdScv input : {dndscv_csv}")
     print(f"  (optional) SNVs   : {snv_csv}")
     print(f"  (optional) INDELs : {indel_csv}")
