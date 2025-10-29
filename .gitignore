@@ -61,3 +61,26 @@ conda-env/
 
 # Docker build context you don't want baked into images
 docker-cache/
+
+# envs and platform caches
+
+micromamba/
+__pycache__/
+*.pyc
+
+# results, logs, reports
+results/
+myresults/
+out/
+*.log
+*.tsv
+*.csv
+
+# containers & builds
+*.sif
+*.img
+*.dmg
+
+# OS cruft
+.DS_Store
+Thumbs.db
