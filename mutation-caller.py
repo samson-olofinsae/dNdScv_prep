@@ -189,7 +189,7 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
         sh(f"bcftools view -v indels {qq(vcf_all)} -Oz -o {qq(vcf_indels)}")
         tabix_index(vcf_indels)
 
-        # Extract TSVs for dNdScv
+        # Extract TSVs (intermediate) for dNdScv
         snv_tsv   = outdir/"vcf"/"snvs"/f"{base}_snvs.tsv"
         indel_tsv = outdir/"vcf"/"indels"/f"{base}_indels.tsv"
         bcftools_query_to_tsv(vcf_snvs, snv_tsv)
@@ -225,18 +225,20 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
     if not dndscv_all["mut"].astype(str).str.upper().apply(lambda s: set(s) <= valid_nt).all():
         sys.exit("ERROR: Invalid MUT symbols detected.")
 
-    # Write outputs
-    (ddir/"combined_snv_variants.tsv").write_text(
-        snv_all.to_csv(sep="\t", index=False), encoding="utf-8"
-    )
-    (ddir/"combined_indels_variants.tsv").write_text(
-        indel_all.to_csv(sep="\t", index=False), encoding="utf-8"
-    )
-    (ddir/"dndscv_input.tsv").write_text(
-        dndscv_all.to_csv(sep="\t", index=False), encoding="utf-8"
-    )
+    # ------------------ Write outputs (CSV) ------------------
+    ddir.mkdir(parents=True, exist_ok=True)
 
-    # Simple per-sample summary
+    # Optional per-type CSVs (for QC/inspection)
+    snv_csv   = ddir / "combined_snv_variants.csv"
+    indel_csv = ddir / "combined_indels_variants.csv"
+    snv_all.to_csv(snv_csv, index=False)         # sampleID,chr,pos,ref,mut
+    indel_all.to_csv(indel_csv, index=False)
+
+    # REQUIRED: single combined CSV for dNdScv
+    dndscv_csv = ddir / "dndscv_input.csv"
+    dndscv_all.to_csv(dndscv_csv, index=False)
+
+    # Simple per-sample summary (CSV)
     summary_rows = []
     if not snv_all.empty:
         c = snv_all.groupby("sampleID").size().rename("n").reset_index()
@@ -248,14 +250,14 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
         summary_rows.append(c)
     if summary_rows:
         summary = pd.concat(summary_rows, ignore_index=True)
-        summary.to_csv(outdir/"reports_summary.tsv", sep="\t", index=False)
+        summary.to_csv(outdir/"reports_summary.csv", index=False)
 
     print("\n✅ Done.")
-    print(f"  dNdScv input : {ddir/'dndscv_input.tsv'}")
-    print(f"  SNVs table   : {ddir/'combined_snv_variants.tsv'}")
-    print(f"  INDELs table : {ddir/'combined_indels_variants.tsv'}")
-    if (outdir/'reports_summary.tsv').exists():
-        print(f"  Summary      : {outdir/'reports_summary.tsv'}")
+    print(f"  dNdScv input : {dndscv_csv}")
+    print(f"  (optional) SNVs   : {snv_csv}")
+    print(f"  (optional) INDELs : {indel_csv}")
+    if (outdir/'reports_summary.csv').exists():
+        print(f"  Summary      : {outdir/'reports_summary.csv'}")
 
 # --------------------------- entrypoint ---------------------------
 
