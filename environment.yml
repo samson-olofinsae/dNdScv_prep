@@ -1,0 +1,20 @@
+name: dndscv-prep
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+channel_priority: strict
+dependencies:
+  - python=3.9
+  - pandas=2.1
+  - bwa=0.7.17
+  - samtools=1.19
+  - bcftools=1.19
+  - htslib=1.19
+  - tabix=1.11        # pulls htslib; included for clarity
+  - pigz=2.8
+  - gzip
+  - coreutils
+  - grep
+  - sed
+  - pip
