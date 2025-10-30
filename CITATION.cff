@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use this tool in your work, please cite it as below."
+title: "dNdScv_prep: Reproducible generator of dNdScv input tables from FASTQ/VCF"
+version: "0.1.0"
+date-released: "2025-10-30"
+authors:
+  - family-names: Olofinsae
+    given-names: Samson Ayodeji
+    affiliation: "Genomics & Bioinformatics Researcher (UK)"
+repository-code: "https://github.com/samson-olofinsae/dNdScv_prep"
+license: "MIT"
+keywords:
+  - bioinformatics
+  - dNdScv
+  - cancer genomics
+  - somatic mutations
+  - reproducibility
+  - pipeline
+  - variant calling
+abstract: >
+  dNdScv_prep prepares a single, combined mutation table (SNVs + indels;
+  columns: sampleID, chr, pos, ref, mut) from raw FASTQs or existing VCFs, suitable
+  for downstream selection analysis with the R package dNdScv. The project focuses on
+  being complementary to dNdScv, offering a container-ready, reproducible path to
+  generate correctly formatted inputs at scale.
+preferred-citation:
+  type: software
+  title: "dNdScv_prep: Reproducible generator of dNdScv input tables from FASTQ/VCF"
+  authors:
+    - family-names: Olofinsae
+      given-names: Samson Ayodeji
+  year: 2025
+  version: "0.1.0"
+  repository-code: "https://github.com/samson-olofinsae/dNdScv_prep"
+references:
+  - type: software
+    title: "dNdScv (R package)"
+    authors:
+      - name: "Inigo Martincorena and contributors"
+    url: "https://github.com/im3sanger/dndscv"
+    notes: "dN/dS selection inference engine used downstream. Please cite the dNdScv paper as appropriate."
