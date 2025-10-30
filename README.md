@@ -90,7 +90,7 @@ This layout allows reproducible demo runs while keeping real genomic data out of
 
 ---
 
-## Containerization
+## Containerisation
 
 The `environment.yml` file specifies all dependencies (`bwa`, `samtools`, `bcftools`, `pandas`, `python >= 3.9`).  
 This environment can be exported to **Singularity** or **Docker** images for cross-system reproducibility.
