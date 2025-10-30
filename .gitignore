@@ -1,12 +1,43 @@
-# === Runtime outputs (do not track) ===
+# =========================
+# 1. Runtime outputs
+# =========================
+# Ignore all heavy runtime outputs by default...
 results*/
 **/bam/
 **/bcf/
 **/vcf/
 **/dndscv/
-**/reports_summary.tsv
+**/work/
+**/tmp/
+scratch/
 
-# Common genomics artifacts
+# ...except demo results (keep visible for reviewers)
+!results_demo*/
+!results_demo/**
+!demo_results*/
+!demo_results/**
+
+# =========================
+# 2. Real user data directories (personal runs)
+# =========================
+user_ref/
+user_fastq/
+user_results*/
+user_output*/
+
+# =========================
+# 3. Demo assets (always keep tracked)
+# =========================
+!demo_ref/**
+!demo_fastq/**
+!R/demo/**
+!docs/**
+!examples/**
+!results_demo/**
+
+# =========================
+# 4. Genomics data patterns (ignore real data)
+# =========================
 *.fastq
 *.fastq.gz
 *.fq
@@ -22,65 +53,54 @@ results*/
 *.bcf
 *.bcf.gz
 
-# Logs / scratch
+# Allow demo FASTQs explicitly
+!demo_fastq/*.fastq.gz
+
+# =========================
+# 5. Logs / scratch
+# =========================
 *.log
 *.err
 *.out
 *.tmp
-tmp/
-scratch/
-work/
 
-# Python noise
+# =========================
+# 6. Python artifacts
+# =========================
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
 *.egg-info/
 .venv/
 venv/
 .env
 .env.*
 
-# Jupyter (if you later add notebooks)
+# =========================
+# 7. R / Notebooks
+# =========================
+.Rhistory
+.Rproj.user/
 .ipynb_checkpoints/
 
-# OS / editor
-.DS_Store
-*.swp
-*.swo
-
-# Containers / images / caches
-*.sif
-.singularity/
-.singularity-cache/
-.conda/
-conda-env/
-.mamba/
-.micromamba/
-
-# Docker build context you don't want baked into images
-docker-cache/
-
-# envs and platform caches
-
-micromamba/
-__pycache__/
-*.pyc
-
-# results, logs, reports
-results/
-myresults/
-out/
-*.log
-*.tsv
-*.csv
-
-# containers & builds
+# =========================
+# 8. Containers / caches
+# =========================
 *.sif
 *.img
-*.dmg
+.singularity/
+.singularity-cache/
+.mamba/
+.micromamba/
+.conda/
+conda-env/
+docker-cache/
 
-# OS cruft
+# =========================
+# 9. Editors / OS
+# =========================
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
