@@ -55,7 +55,7 @@ results_demo/
 
 ### 3. Run on real data (ignored by Git)
 ```bash
-python3 mutation-caller.py --ref user_ref/hg19.fa  --r1-source "user_fastq/*_R1.fastq.gz" --outdir user_results   --threads 8 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index
+python3 mutation-caller.py --ref user_ref/hg19.fa --r1-source "user_fastq/*_R1.fastq.gz" --outdir user_results --threads 8 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index
 ```
 
 ---
