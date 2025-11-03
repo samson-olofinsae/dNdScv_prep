@@ -12,10 +12,10 @@ results*/
 scratch/
 
 # ...except demo results (keep visible for reviewers)
-!results_demo*/
-!results_demo/**
-!demo_results*/
-!demo_results/**
+results_demo*/
+results_demo/**
+demo_results*/
+demo_results/**
 
 # =========================
 # 2. Real user data directories (personal runs)

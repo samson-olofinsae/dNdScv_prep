@@ -69,7 +69,7 @@ python3 mutation-caller.py \
 - This project **does not** re-implement the dNdScv engine; it **prepares** the input table.
 
 ## Acknowledgements
-This tool **complements** the excellent **dNdScv** package by **Dr. Iñigo Martincorena** and colleagues (Wellcome Sanger Institute). Please cite their work when using this pipeline.
+This tool **complements** the excellent **dNdScv** package by **Dr. Inigo Martincorena** and colleagues (Wellcome Sanger Institute). Please cite their work when using this pipeline.
 
 ## Cite
 If you use this pipeline, please cite:

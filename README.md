@@ -126,7 +126,7 @@ Our collaborator and **dNdScv** creator
 **Dr Inigo Martincorena**, PhD - Group Leader, Somatic Evolution Group, Wellcome Sanger Institute  
 
 Our mentors and collaborators  
-- **Prof David Wedge**  -Cancer Research UK Manchester Centre  
+- **Prof David Wedge**  - Cancer Research UK Manchester Centre  
 - **Prof Rosalind Eeles** - Institute of Cancer Research, UK  
 - **Prof Daniel Brewer** - University of East Anglia  
 - **Prof Colin Cooper** - University of East Anglia  
