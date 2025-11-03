@@ -8,10 +8,10 @@
 
 **dNdScv_prep** is a lightweight, reproducible pipeline that automates generation of the `dNdScv_input.csv` file required by the [**dNdScv**](https://github.com/im3sanger/dndscv) R package developed by **Dr Inigo Martincorena** (Wellcome Sanger Institute).
 
-Our tool does **not** re-implement dNdScv.  
+Our tool does **not** re-implement dNdScv.
 Instead, it **complements** it - automating all upstream data-processing steps and simplifying the workflow for postdocs, early-career researchers, and clinicians who wish to run *dNdScv* reproducibly on their own datasets.
 
-> **Core Workflow:**  
+> **Core Workflow:**
 > FASTQ → BAM → VCF → Combined Variants → dNdScv Input CSV
 
 ### What does dNdScv do?
@@ -38,9 +38,9 @@ conda env create -f environment.yml
 conda activate dndscv-prep
 ```
 
-### 2 Run demo (tracked in repo)
+### 2. Run demo (tracked in repo)
 ```bash
-python3 mutation-caller.py --ref demo_ref/demo.fa --r1-source "demo_fastq/*_R1.fastq.gz" --outdir results_demo --threads 4 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index
+python3 mutation-caller.py --ref demo_ref/demo.fa --r1-source "demo_fastq/*_R1.fastq.gz" --outdir results_demo --threads 4 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index --yes
 ```
 
 This produces:
@@ -55,8 +55,51 @@ results_demo/
 
 ### 3. Run on real data (ignored by Git)
 ```bash
-python3 mutation-caller.py --ref user_ref/hg19.fa --r1-source "user_fastq/*_R1.fastq.gz" --outdir user_results --threads 8 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index
+python3 mutation-caller.py --ref user_ref/hg19.fa --r1-source "user_fastq/*_R1.fastq.gz" --outdir user_results --threads 8 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index --yes
 ```
+
+---
+
+## Interactive Mode (Optional)
+
+You can also run the pipeline *interactively* without any flags.
+This is useful for beginners or for documentation screenshots.
+
+```bash
+python3 mutation-caller.py
+```
+
+When launched, the terminal will display prompts like:
+
+```
+Accepted format for FASTQs is *_R1.fastq.gz and *_R2.fastq.gz
+TIP: Reference FASTA path example: ./demo_ref/demo.fa
+TIP: FASTQ glob (R1) example:      ./demo_fastq/*_R1.fastq.gz
+
+Is your input FASTQ in the accepted format? [Y/n]: y
+Enter path to reference FASTA [./demo_ref/demo.fa]:
+FASTQ location (directory OR glob) [*_R1.fastq.gz]: ./demo_fastq/*_R1.fastq.gz
+Choose output directory [results]: results_demo
+Threads to use [4]: 4
+Ploidy for bcftools call [2]: 2
+
+Summary:
+  Working dir : /path/to/dNdScv_prep
+  Reference   : /path/to/dNdScv_prep/demo_ref/demo.fa
+  Outputs to  : /path/to/dNdScv_prep/results_demo
+  Threads     : 4
+  Ploidy      : 2
+  Filters     : QUAL>=20, DP>=10
+  Samples     : 3
+Proceed with processing? [Y/n]: y
+```
+
+**Expected entries for the demo run:**
+| Prompt | Example user input |
+|--------|---------------------|
+| *Reference FASTA* | `./demo_ref/demo.fa` |
+| *FASTQ location*  | `./demo_fastq/*_R1.fastq.gz` |
+| *Output directory* | `results_demo` |
 
 ---
 
@@ -86,13 +129,14 @@ This layout allows reproducible demo runs while keeping real genomic data out of
 | `--min-qual` | Minimum QUAL threshold | `20` |
 | `--min-dp` | Minimum depth threshold | `10` |
 | `--auto-index` | Auto-generate BWA / FASTA indexes | `false` |
-| `--non-interactive` | Run without prompts | `false` |
+| `--yes` | Auto-accept all interactive prompts (still prints them) | `false` |
+| `--non-interactive` | Fully silent mode (for CI/CD) | `false` |
 
 ---
 
 ## Containerisation
 
-The `environment.yml` file specifies all dependencies (`bwa`, `samtools`, `bcftools`, `pandas`, `python >= 3.9`).  
+The `environment.yml` file specifies all dependencies (`bwa`, `samtools`, `bcftools`, `pandas`, `python >= 3.9`).
 This environment can be exported to **Singularity** or **Docker** images for cross-system reproducibility.
 
 Example:
@@ -123,10 +167,10 @@ R/demo/dndscv_demo_input.csv
 ## Acknowledgements
 
 Our collaborator and **dNdScv** creator  
-**Dr Inigo Martincorena**, PhD - Group Leader, Somatic Evolution Group, Wellcome Sanger Institute  
+**Dr Inigo Martincorena**, PhD - Group Leader, Somatic Evolution Group, Wellcome Sanger Institute
 
 Our mentors and collaborators  
-- **Prof David Wedge**  - Cancer Research UK Manchester Centre  
+- **Prof David Wedge** - Cancer Research UK Manchester Centre  
 - **Prof Rosalind Eeles** - Institute of Cancer Research, UK  
 - **Prof Daniel Brewer** - University of East Anglia  
 - **Prof Colin Cooper** - University of East Anglia  

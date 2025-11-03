@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List
 import pandas as pd
 
-# --------------------------- helpers ---------------------------
+# --------------------------- helpers (shell + fs) ---------------------------
 
 def qq(p) -> str:
     """Shell-safe quote a path/arg."""
@@ -27,50 +27,57 @@ def which_or_die(tool):
         sys.exit(f"ERROR: '{tool}' not in PATH. Please install or load your env.")
     return tool
 
-def prompt_yn(msg, default="y"):
-    d = default.lower()
-    while True:
-        ans = input(f"{msg} [{'Y/n' if d=='y' else 'y/N'}]: ").strip().lower()
-        if ans == "" and d in ("y","n"):
-            return d == "y"
-        if ans in ("y","yes"): return True
-        if ans in ("n","no"):  return False
-        print("Please answer y or n.")
+# --------------------------- helpers (uniform prompts) ---------------------------
 
-def prompt_str(msg, default=None, allow_blank=False):
-    while True:
-        ans = input(f"{msg}{f' [{default}]' if default else ''}: ").strip()
-        if ans == "" and default is not None:
-            return default
-        if ans == "" and allow_blank:
-            return ""
-        if ans != "":
-            return ans
-        print("Please enter a value.")
+def _print_prompt(label, default, used):
+    """Echo a prompt line uniformly (even when auto-accepting)."""
+    if default is None:
+        print(f"{label}: {used}")
+    else:
+        print(f"{label} [{default}]: {used}")
 
-def prompt_int(msg, default=None, minval=None, maxval=None):
-    while True:
-        raw = input(f"{msg}{f' [{default}]' if default is not None else ''}: ").strip()
-        if raw == "" and default is not None:
-            val = default
-        else:
-            try:
-                val = int(raw)
-            except ValueError:
-                print("Please enter a whole number.")
-                continue
-        if minval is not None and val < minval:
-            print(f"Must be ≥ {minval}."); continue
-        if maxval is not None and val > maxval:
-            print(f"Must be ≤ {maxval}."); continue
-        return val
+def prompt_value(label, default=None, current=None, assume_yes=False, cast=None, validator=None):
+    """
+    Uniform prompt. When assume_yes=True, we *still print the prompt line*
+    but auto-accept the provided 'current' (or default if current is None).
+    """
+    # precedence: CLI current -> default
+    value = current if (current not in [None, ""]) else default
 
-def tabix_index(vcf_gz: Path):
-    sh(f"tabix -p vcf {qq(vcf_gz)}")
+    if assume_yes:
+        _print_prompt(label, default, value)
+    else:
+        prompt = f"{label}"
+        if default is not None:
+            prompt += f" [{default}]"
+        prompt += ": "
+        entered = input(prompt).strip()
+        value = entered if entered else value
 
-def bcftools_query_to_tsv(vcf_gz: Path, out_tsv: Path):
-    qfmt = r'[%CHROM\t%POS\t%REF\t%ALT\n]'
-    sh(f"bcftools query -f '{qfmt}' {qq(vcf_gz)} > {qq(out_tsv)}")
+    if cast:
+        try:
+            value = cast(value)
+        except Exception:
+            sys.exit(f"ERROR: invalid value for '{label}': {value}")
+    if validator:
+        value = validator(value)
+    return value
+
+def prompt_yes_no(label, default="Y", assume_yes=False):
+    """
+    Uniform Y/n confirmation. With assume_yes=True, we print and auto-accept default.
+    """
+    default = default.upper()
+    suffix = "Y/n" if default == "Y" else "y/N"
+    if assume_yes:
+        print(f"{label} [{suffix}]: {default.lower()}")
+        return default == "Y"
+    resp = input(f"{label} [{suffix}]: ").strip().lower()
+    if not resp:
+        return default == "Y"
+    return resp.startswith("y")
+
+# --------------------------- discovery ---------------------------
 
 def discover_r1s_from_source(source: str) -> List[Path]:
     """
@@ -114,7 +121,7 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
         if auto_index or assume_yes:
             sh(f"bwa index {qq(ref)}")
         else:
-            if prompt_yn(f"bwa index not found for {ref}. Create it now?", default="y"):
+            if prompt_yes_no(f"bwa index not found for {ref}. Create it now?", default="Y", assume_yes=False):
                 sh(f"bwa index {qq(ref)}")
             else:
                 sys.exit("Cannot continue without BWA index.")
@@ -122,7 +129,7 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
         if auto_index or assume_yes:
             sh(f"samtools faidx {qq(ref)}")
         else:
-            if prompt_yn(f"samtools faidx not found for {ref}. Create it now?", default="y"):
+            if prompt_yes_no(f"samtools faidx not found for {ref}. Create it now?", default="Y", assume_yes=False):
                 sh(f"samtools faidx {qq(ref)}")
             else:
                 sys.exit("Cannot continue without FASTA index (.fai).")
@@ -139,18 +146,17 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
 
     print(f"FASTQ discovery pattern/source: {r1_glob_or_dir}")
 
-    # Confirm summary (only in interactive mode)
-    if not assume_yes:
-        print("\nSummary:")
-        print(f"  Working dir : {wd}")
-        print(f"  Reference   : {ref}")
-        print(f"  Outputs to  : {outdir.resolve()}")
-        print(f"  Threads     : {threads}")
-        print(f"  Ploidy      : {ploidy}")
-        print(f"  Filters     : QUAL>={min_qual}, DP>={min_dp}")
-        print(f"  Samples     : {len(r1s)}")
-        if not prompt_yn("Proceed with processing?", default="y"):
-            sys.exit("Aborted by user.")
+    # Confirm summary (ALWAYS printed; auto-accepted with --yes)
+    print("\nSummary:")
+    print(f"  Working dir : {wd}")
+    print(f"  Reference   : {ref}")
+    print(f"  Outputs to  : {outdir.resolve()}")
+    print(f"  Threads     : {threads}")
+    print(f"  Ploidy      : {ploidy}")
+    print(f"  Filters     : QUAL>={min_qual}, DP>={min_dp}")
+    print(f"  Samples     : {len(r1s)}")
+    if not prompt_yes_no("Proceed with processing?", default="Y", assume_yes=assume_yes):
+        sys.exit("Aborted by user.")
 
     snv_rows, indel_rows = [], []
 
@@ -231,7 +237,7 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
     # Optional per-type CSVs (for QC/inspection)
     snv_csv   = ddir / "combined_snv_variants.csv"
     indel_csv = ddir / "combined_indels_variants.csv"
-    snv_all.to_csv(snv_csv, index=False)         # sampleID,chr,pos,ref,mut
+    snv_all.to_csv(snv_csv, index=False)
     indel_all.to_csv(indel_csv, index=False)
 
     # REQUIRED: single combined CSV for dNdScv
@@ -269,12 +275,12 @@ def build_parser():
     p.add_argument("--non-interactive", action="store_true",
                    help="Run with provided flags only (no prompts).")
     p.add_argument("--yes", "--assume-yes", dest="assume_yes", action="store_true",
-                   help="Assume 'yes' to confirmations (useful for interactive run with auto indexing).")
+                   help="Auto-accept prompts but still PRINT them (uniform screenshots).")
 
     # inputs / outputs
     p.add_argument("--ref", help="Path to reference FASTA")
     p.add_argument("--r1-source", default="*_R1.fastq.gz",
-                   help="Directory OR glob for R1 FASTQs (e.g., '/data/cohort' or '/data/*/*_R1.fastq.gz').")
+                   help="Directory OR glob for R1 FASTQs (e.g., '/data/cohort' or './demo_fastq/*_R1.fastq.gz').")
     p.add_argument("--outdir", default="results", help="Output directory (default: results)")
 
     # params
@@ -290,10 +296,8 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
 
-    wd = Path.cwd()
-
+    # STRICT CI mode
     if args.non_interactive:
-        # strict: require ref in non-interactive
         if not args.ref:
             sys.exit("ERROR: --non-interactive requires --ref <fasta>")
         run_pipeline(
@@ -305,38 +309,66 @@ def main():
             min_qual=args.min_qual,
             min_dp=args.min_dp,
             auto_index=args.auto_index,
-            assume_yes=True  # never prompt in non-interactive
+            assume_yes=True  # non-interactive: no prompts printed
         )
         return
 
-    # -------- INTERACTIVE FLOW (prompts) --------
+    # -------- INTERACTIVE-LOOK FLOW (works with or without --yes) --------
     print("Accepted format for FASTQs is *_R1.fastq.gz and *_R2.fastq.gz")
-    ok_fmt = prompt_yn("Is your input FASTQ in the accepted format?", default="y")
-    if not ok_fmt:
-        print("Please transform your FASTQs and re-run.")
-        sys.exit(0)
+    print("TIP: Reference FASTA path example: ./demo_ref/demo.fa")
+    print("TIP: FASTQ glob (R1) example:      ./demo_fastq/*_R1.fastq.gz")
+    print()
 
-    # Reference (allow any path)
-    ref_default = None
-    fasta_candidates = list(wd.glob("*.fa")) + list(wd.glob("*.fasta")) + list(wd.glob("*.fna"))
-    if len(fasta_candidates) == 1:
-        ref_default = str(fasta_candidates[0])
-    ref_input = prompt_str("Enter path to reference FASTA", default=ref_default)
+    # Reference (path)
+    wd = Path.cwd()
+    default_ref = "./demo_ref/demo.fa" if (wd/"demo_ref"/"demo.fa").exists() else None
+    ref_input = prompt_value(
+        "Enter path to reference FASTA",
+        default=default_ref,
+        current=args.ref,
+        assume_yes=args.assume_yes
+    )
     ref_path = Path(ref_input).expanduser()
     if not ref_path.is_absolute():
         ref_path = (wd / ref_path)
     ref_path = ref_path.resolve()
 
-    # FASTQ location (dir or glob)
-    fq_source = prompt_str("FASTQ location (directory OR glob)", default=args.r1_source)
+    # FASTQ source (dir or glob)
+    r1_source = prompt_value(
+        "FASTQ location (directory OR glob)",
+        default="*_R1.fastq.gz",
+        current=args.r1_source,
+        assume_yes=args.assume_yes
+    )
 
-    outdir = Path(prompt_str("Choose output directory", default=args.outdir))
-    threads = prompt_int("Threads to use", default=args.threads, minval=1)
-    ploidy  = prompt_int("Ploidy for bcftools call", default=args.ploidy, minval=1)
+    # Output dir
+    outdir_str = prompt_value(
+        "Choose output directory",
+        default=args.outdir,
+        current=args.outdir,
+        assume_yes=args.assume_yes
+    )
+    outdir = Path(outdir_str)
+
+    # Threads / Ploidy
+    threads = prompt_value(
+        "Threads to use",
+        default=str(args.threads),
+        current=str(args.threads),
+        assume_yes=args.assume_yes,
+        cast=int
+    )
+    ploidy  = prompt_value(
+        "Ploidy for bcftools call",
+        default=str(args.ploidy),
+        current=str(args.ploidy),
+        assume_yes=args.assume_yes,
+        cast=int
+    )
 
     run_pipeline(
         ref=ref_path,
-        r1_glob_or_dir=fq_source,
+        r1_glob_or_dir=r1_source,
         outdir=outdir,
         threads=threads,
         ploidy=ploidy,
