@@ -13,6 +13,7 @@ scratch/
 
 # ...except demo results (keep visible for reviewers)
 results_demo*/
+results_demo/
 results_demo/**
 demo_results*/
 demo_results/**
@@ -24,6 +25,7 @@ user_ref/
 user_fastq/
 user_results*/
 user_output*/
+
 
 # =========================
 # 3. Demo assets (always keep tracked)
