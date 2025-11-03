@@ -66,7 +66,7 @@ python3 mutation-caller.py --ref user_ref/hg19.fa --r1-source "user_fastq/*_R1.f
 |---------|----------|---------|
 | `demo_ref/` | Tiny toy reference FASTA | Tracked |
 | `demo_fastq/` | Small paired FASTQ demo files | Tracked |
-| `results_demo/` | Example output for reviewers | Tracked |
+| `results_demo/` | Example output for reviewers | Not Tracked |
 | `R/demo/` | Example CSVs & demo outputs | Tracked |
 | `user_ref/`, `user_fastq/`, `user_results/` | Real data (private) | Ignored |
 
