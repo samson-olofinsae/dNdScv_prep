@@ -78,7 +78,7 @@ Accepted format for FASTQs is *_R1.fastq.gz and *_R2.fastq.gz
 TIP: Reference FASTA path example: ./demo_ref/demo.fa
 TIP: FASTQ glob (R1) example:      ./demo_fastq/*_R1.fastq.gz
 
-Enter path to reference FASTA [./demo_ref/demo.fa]:
+Enter path to reference FASTA [./demo_ref/demo.fa]: ./demo_ref/demo.fa
 FASTQ location (directory OR glob) [*_R1.fastq.gz]: ./demo_fastq/*_R1.fastq.gz
 Choose output directory [results]: results_demo
 Threads to use [4]: 4
