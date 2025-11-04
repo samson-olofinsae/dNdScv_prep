@@ -9,7 +9,7 @@
 
 ## Overview
 
-**dNdScv_prep** is a lightweight, reproducible pipeline that automates generation of the `dNdScv_input.csv` file required by the [**dNdScv**](https://github.com/im3sanger/dndscv) R package developed by **Dr. Iñigo Martincorena** (Wellcome Sanger Institute).
+**dNdScv_prep** is a lightweight, reproducible pipeline that automates generation of the `dNdScv_input.csv` file required by the [**dNdScv**](https://github.com/im3sanger/dndscv) R package developed by **Dr. Inigo Martincorena** (Wellcome Sanger Institute).
 
 Our tool does **not** re‑implement dNdScv.  
 Instead, it **complements** it — automating upstream data‑processing steps and simplifying the workflow for postdocs, early‑career researchers, and clinicians who wish to run *dNdScv* reproducibly on their own datasets.
