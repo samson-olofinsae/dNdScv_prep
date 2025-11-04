@@ -1,23 +1,26 @@
 # dNdScv_prep
 
-### FASTQ → BAM → VCF → dNdScv Input (Container-Ready Workflow)
+[![Latest Release](https://img.shields.io/badge/release-v1.2.0-blue.svg)](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.0)
+[**Latest (v1.2.0) release notes →**](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.0)
+
+### FASTQ → BAM → VCF → dNdScv Input (Container‑Ready Workflow)
 
 ---
 
 ## Overview
 
-**dNdScv_prep** is a lightweight, reproducible pipeline that automates generation of the `dNdScv_input.csv` file required by the [**dNdScv**](https://github.com/im3sanger/dndscv) R package developed by **Dr Inigo Martincorena** (Wellcome Sanger Institute).
+**dNdScv_prep** is a lightweight, reproducible pipeline that automates generation of the `dNdScv_input.csv` file required by the [**dNdScv**](https://github.com/im3sanger/dndscv) R package developed by **Dr. Iñigo Martincorena** (Wellcome Sanger Institute).
 
-Our tool does **not** re-implement dNdScv.
-Instead, it **complements** it - automating all upstream data-processing steps and simplifying the workflow for postdocs, early‑career researchers, and clinicians who wish to run *dNdScv* reproducibly on their own datasets.
+Our tool does **not** re‑implement dNdScv.  
+Instead, it **complements** it — automating upstream data‑processing steps and simplifying the workflow for postdocs, early‑career researchers, and clinicians who wish to run *dNdScv* reproducibly on their own datasets.
 
 > **Core Workflow:**  
-> FASTQ → BAM → VCF → Combined Variants → dNdScv Input CSV
+> FASTQ → BAM → VCF → Combined Variants → **dNdScv Input CSV**
 
 ### What does dNdScv do?
-The **dNdScv** R package estimates the ratio of non-synonymous to synonymous substitutions (dN/dS) across genes, enabling the detection of positive selection in somatic mutations. It’s a powerful tool for identifying **driver genes** in cancer and somatic evolution studies.
+The **dNdScv** R package estimates the ratio of non‑synonymous to synonymous substitutions (dN/dS) across genes, enabling detection of positive selection in somatic mutations. It’s a powerful tool for identifying **driver genes** in cancer and somatic evolution studies.
 
-This pipeline complements dNdScv by generating a clean, ready‑to‑use input file directly from raw FASTQ data - closing the gap between raw sequencing data and selection analysis.
+This pipeline closes the gap between **raw sequencing data** and **selection analysis** by producing a clean, ready‑to‑use input file for dNdScv.
 
 ---
 
@@ -104,7 +107,7 @@ Proceed with processing? [Y/n]: y
 
 ---
 
-## If your FASTA isn’t indexed (auto-index)
+## If your FASTA isn’t indexed (auto‑index)
 
 If the required index files for your reference FASTA (e.g. `demo.fa.bwt`, `demo.fa.fai`, `demo.fa.pac`, `demo.fa.ann`, `demo.fa.amb`, `demo.fa.sa`) are **missing**, you can auto‑generate them while keeping the rest of the run interactive:
 
@@ -183,7 +186,7 @@ R/demo/dndscv_demo_input.csv
 ## Acknowledgements
 
 Our collaborator and **dNdScv** creator  
-**Dr Inigo Martincorena**, PhD - Group Leader, Somatic Evolution Group, Wellcome Sanger Institute
+**Dr. Iñigo Martincorena**, PhD - Group Leader, Somatic Evolution Group, Wellcome Sanger Institute
 
 Our mentors and collaborators
 - **Prof David Wedge** - Cancer Research UK Manchester Centre
@@ -197,4 +200,4 @@ Our mentors and collaborators
 
 ## License
 
-This project is released under the **MIT License** — see [LICENSE](./LICENSE) for details.
+This project is released under the **MIT License** - see [LICENSE](./LICENSE) for details.
