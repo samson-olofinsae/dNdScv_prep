@@ -1,7 +1,7 @@
 # dNdScv_prep
 
-[![Latest Release](https://img.shields.io/badge/release-v1.2.1-blue.svg)](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.1)
-[**Latest (v1.2.1) release notes →**](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.1)
+[![Latest Release](https://img.shields.io/badge/release-v1.2.2-blue.svg)](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.2)
+[**Latest (v1.2.2) release notes →**](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.2)
 
 ### FASTQ → BAM → VCF → dNdScv Input (Container‑Ready Workflow)
 
@@ -9,18 +9,13 @@
 
 ## Overview
 
-**dNdScv_prep** is a lightweight, reproducible pipeline that automates generation of the `dNdScv_input.csv` file required by the [**dNdScv**](https://github.com/im3sanger/dndscv) R package developed by **Dr. Iñigo Martincorena** (Wellcome Sanger Institute).
+**dNdScv_prep** is a lightweight, reproducible pipeline that automates generation of the `dNdScv_input.csv` file required by the [**dNdScv**](https://github.com/im3sanger/dndscv) R package developed by **Dr. Inigo Martincorena** (Wellcome Sanger Institute).
 
 Our tool does **not** re‑implement dNdScv.
 Instead, it **complements** it - automating upstream data‑processing steps and simplifying the workflow for postdocs, early‑career researchers, and clinicians who wish to run *dNdScv* reproducibly on their own datasets.
 
 > **Core Workflow:**
 > FASTQ → BAM → VCF → Combined Variants → **dNdScv Input CSV**
-
-### What does dNdScv do?
-The **dNdScv** R package estimates the ratio of non‑synonymous to synonymous substitutions (dN/dS) across genes, enabling detection of positive selection in somatic mutations. It’s a powerful tool for identifying **driver genes** in cancer and somatic evolution studies.
-
-This pipeline closes the gap between **raw sequencing data** and **selection analysis** by producing a clean, ready‑to‑use input file for dNdScv.
 
 ---
 
@@ -61,7 +56,42 @@ results_demo/
 python3 mutation-caller.py --ref user_ref/<your_reference_file>.fa --r1-source "user_fastq/*_R1.fastq.gz" --outdir user_results --threads 8 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index --yes
 ```
 
-> **Note:** Replace `<your_reference_file>` with your own reference FASTA filename (e.g. `hg19.fa`, `GRCh38.fa`, or `custom_ref.fa`).
+> **Note:** Replace `<your_reference_file>` with your actual FASTA name (e.g. `hg19.fa`, `GRCh38.fa`, or `custom_ref.fa`).
+
+---
+
+## Preparing Your Own Data Folders
+
+Before running the pipeline on your own data, make sure the following directories exist:
+
+```
+user_ref/       # store your reference FASTA file(s) here
+user_fastq/     # store your paired FASTQ files here
+```
+
+If they don’t exist yet, simply create them manually:
+
+```bash
+mkdir -p user_ref user_fastq
+```
+
+Then copy your reference and FASTQ files into those folders.  
+For example:
+
+```bash
+cp /path/to/your_reference.fa user_ref/
+cp /path/to/sample*_R*.fastq.gz user_fastq/
+```
+
+Once your files are in place, you can run:
+
+```bash
+python3 mutation-caller.py --ref user_ref/<your_reference_file>.fa --r1-source "user_fastq/*_R1.fastq.gz" --outdir user_results  --threads 8 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index --yes
+```
+
+> **Note:** Replace `<your_reference_file>` with your actual FASTA name  
+> (e.g. `hg19.fa`, `GRCh38.fa`, or `custom_ref.fa`).  
+> The `user_results/` folder will be created automatically when the pipeline runs.
 
 ---
 
@@ -80,16 +110,16 @@ Accepted format for FASTQs is *_R1.fastq.gz and *_R2.fastq.gz
 TIP: Reference FASTA path example: ./demo_ref/demo.fa
 TIP: FASTQ glob (R1) example:      ./demo_fastq/*_R1.fastq.gz
 
-Enter path to reference FASTA [./demo_ref/demo.fa]: ./demo_ref/demo.fa
-FASTQ location (directory OR glob) [*_R1.fastq.gz]: ./demo_fastq/*_R1.fastq.gz
-Choose output directory [results]: results_demo
+Enter path to reference FASTA [user_ref/<your_reference_file>.fa]: ./user_ref/<your_reference_file>.fa
+FASTQ location (directory OR glob) [user_fastq/*_R1.fastq.gz]: ./user_fastq/*_R1.fastq.gz
+Choose output directory [user_results]: user_results
 Threads to use [4]: 4
 Ploidy for bcftools call [2]: 2
 
 Summary:
   Working dir : /path/to/dNdScv_prep
-  Reference   : /path/to/dNdScv_prep/demo_ref/demo.fa
-  Outputs to  : /path/to/dNdScv_prep/results_demo
+  Reference   : /path/to/dNdScv_prep/user_ref/<your_reference_file>.fa
+  Outputs to  : /path/to/dNdScv_prep/user_results
   Threads     : 4
   Ploidy      : 2
   Filters     : QUAL>=20, DP>=10
@@ -97,47 +127,7 @@ Summary:
 Proceed with processing? [Y/n]: y
 ```
 
-**Expected entries for the demo run:**
-
-| Prompt | Example user input |
-|---|---|
-| **Reference FASTA** | `./demo_ref/demo.fa` |
-| **FASTQ location** | `./demo_fastq/*_R1.fastq.gz` |
-| **Output directory** | `results_demo` |
-
 > **Tip:** The pipeline expects paired files named like `sampleA_R1.fastq.gz` and `sampleA_R2.fastq.gz`.
-
----
-
-## Example for New Users (Interactive Mode Explained)
-
-Running the pipeline interactively lets you enter information step by step.  
-Here’s what a *correct* session looks like:
-
-```
-Accepted format for FASTQs is *_R1.fastq.gz and *_R2.fastq.gz
-TIP: Reference FASTA path example: ./demo_ref/demo.fa
-TIP: FASTQ glob (R1) example:      ./demo_fastq/*_R1.fastq.gz
-
-Enter path to reference FASTA [user_ref/<your_reference_file>.fa]: ./user_ref/<your_reference_file>.fa
-FASTQ location (directory OR glob) [user_fastq/*_R1.fastq.gz]: ./user_fastq/*_R1.fastq.gz
-Choose output directory [user_results]: user_results
-```
-
-### Beginner Notes
-
-- Replace `<your_reference_file>` with the **actual name** of your FASTA file (e.g. `hg19.fa`, `GRCh38.fa`, or `my_sample.fa`).
-- Always start paths with `./` if your data is in the project folder.  
-  Example: `./user_ref/hg19_chr8.fa`  
-  Avoid: `user_ref/hg19_chr8.fa]` or `"./user_ref/hg19_chr8.fa"`  
-- Use **Tab autocompletion** in your terminal to fill in filenames automatically and avoid typing mistakes.
-- Do **not** include brackets (`[]`), quotes (`"`) or trailing characters (`]`) when entering paths.
-- Each prompt will show a **suggested default** in brackets. You can just press **Enter** to accept it or type a new value.
-
-> **Pro Tip:**  
-> If you are unsure about your file name, run  
-> `ls user_ref/`  
-> first to list all available FASTA files.
 
 ---
 
@@ -153,20 +143,6 @@ python3 mutation-caller.py --auto-index --yes
 - `--yes` auto‑accepts the yes/no confirmations so indexing proceeds, while still showing the normal prompts for paths and parameters.
 
 > **Note:** Generated index files can be large and are intentionally **gitignored**.
-
----
-
-## Repository Structure
-
-| Folder | Purpose | Tracked |
-|---|---|---|
-| `demo_ref/` | Tiny toy reference FASTA | Tracked |
-| `demo_fastq/` | Small paired FASTQ demo files | Tracked |
-| `results_demo/` | Example output for reviewers | **Not Tracked** |
-| `R/demo/` | Example CSVs & demo outputs | Tracked |
-| `user_ref/`, `user_fastq/`, `user_results/` | Real data (private) | Ignored |
-
-This layout allows reproducible demo runs while keeping real genomic data out of version control.
 
 ---
 
@@ -219,14 +195,14 @@ R/demo/dndscv_demo_input.csv
 
 ## Acknowledgements
 
-Our collaborator and **dNdScv** creator  
-**Dr. Inigo Martincorena**, PhD — Group Leader, Somatic Evolution Group, Wellcome Sanger Institute
+Our collaborator and **dNdScv** creator
+**Dr. Inigo Martincorena**, PhD - Group Leader, Somatic Evolution Group, Wellcome Sanger Institute
 
-Our mentors and collaborators  
-- **Prof David Wedge** - Cancer Research UK Manchester Centre  
-- **Prof Rosalind Eeles** - Institute of Cancer Research, UK  
-- **Prof Daniel Brewer** - University of East Anglia  
-- **Prof Colin Cooper** - University of East Anglia  
+Our mentors and collaborators
+- **Prof David Wedge** - Cancer Research UK Manchester Centre
+- **Prof Rosalind Eeles** - Institute of Cancer Research, UK
+- **Prof Daniel Brewer** - University of East Anglia
+- **Prof Colin Cooper** - University of East Anglia
 
 > This pipeline is a collaborative complement to *dNdScv*, designed to promote openness, reproducibility, and accessibility in somatic mutation research.
 
@@ -234,4 +210,8 @@ Our mentors and collaborators
 
 ## License
 
-This project is released under the **MIT License** — see [LICENSE](./LICENSE) for details.
+This project is released under the **MIT License** - see [LICENSE](./LICENSE) for details.
+
+---
+
+_Last updated: 2025-11-04_
