@@ -17,7 +17,7 @@ Instead, it **complements** it - automating all upstream data-processing steps a
 ### What does dNdScv do?
 The **dNdScv** R package estimates the ratio of non-synonymous to synonymous substitutions (dN/dS) across genes, enabling the detection of positive selection in somatic mutations. It’s a powerful tool for identifying **driver genes** in cancer and somatic evolution studies.
 
-This pipeline complements dNdScv by generating a clean, ready‑to‑use input file directly from raw FASTQ data — closing the gap between raw sequencing data and selection analysis.
+This pipeline complements dNdScv by generating a clean, ready‑to‑use input file directly from raw FASTQ data - closing the gap between raw sequencing data and selection analysis.
 
 ---
 
