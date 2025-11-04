@@ -10,7 +10,6 @@ import pandas as pd
 # --------------------------- helpers (shell + fs) ---------------------------
 
 def qq(p) -> str:
-    """Shell-safe quote a path/arg."""
     return shlex.quote(str(p))
 
 def sh(cmd, check=True):
@@ -27,32 +26,27 @@ def which_or_die(tool):
         sys.exit(f"ERROR: '{tool}' not in PATH. Please install or load your env.")
     return tool
 
+def tabix_index(vcf_gz: Path):
+    sh(f"tabix -p vcf {qq(vcf_gz)}")
+
+def bcftools_query_to_tsv(vcf_gz: Path, out_tsv: Path):
+    qfmt = r'[%CHROM\t%POS\t%REF\t%ALT\n]'
+    sh(f"bcftools query -f '{qfmt}' {qq(vcf_gz)} > {qq(out_tsv)}")
+
 # --------------------------- helpers (uniform prompts) ---------------------------
 
-def _print_prompt(label, default, used):
-    """Echo a prompt line uniformly (even when auto-accepting)."""
-    if default is None:
-        print(f"{label}: {used}")
-    else:
-        print(f"{label} [{default}]: {used}")
-
-def prompt_value(label, default=None, current=None, assume_yes=False, cast=None, validator=None):
+def prompt_value(label, default=None, current=None, cast=None, validator=None):
     """
-    Uniform prompt. When assume_yes=True, we *still print the prompt line*
-    but auto-accept the provided 'current' (or default if current is None).
+    Value prompt: ALWAYS allow typing (even when --yes is set).
+    Pre-populate with current (CLI) else default. Hitting ENTER keeps shown value.
     """
-    # precedence: CLI current -> default
-    value = current if (current not in [None, ""]) else default
-
-    if assume_yes:
-        _print_prompt(label, default, value)
-    else:
-        prompt = f"{label}"
-        if default is not None:
-            prompt += f" [{default}]"
-        prompt += ": "
-        entered = input(prompt).strip()
-        value = entered if entered else value
+    shown_default = current if (current not in [None, ""]) else default
+    prompt = f"{label}"
+    if shown_default is not None:
+        prompt += f" [{shown_default}]"
+    prompt += ": "
+    entered = input(prompt).strip()
+    value = entered if entered != "" else shown_default
 
     if cast:
         try:
@@ -65,7 +59,7 @@ def prompt_value(label, default=None, current=None, assume_yes=False, cast=None,
 
 def prompt_yes_no(label, default="Y", assume_yes=False):
     """
-    Uniform Y/n confirmation. With assume_yes=True, we print and auto-accept default.
+    Yes/No confirmation. With assume_yes=True, auto-accept default but echo the line.
     """
     default = default.upper()
     suffix = "Y/n" if default == "Y" else "y/N"
@@ -155,8 +149,11 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
     print(f"  Ploidy      : {ploidy}")
     print(f"  Filters     : QUAL>={min_qual}, DP>={min_dp}")
     print(f"  Samples     : {len(r1s)}")
-    if not prompt_yes_no("Proceed with processing?", default="Y", assume_yes=assume_yes):
+    proceed = prompt_yes_no("Proceed with processing?", default="Y", assume_yes=assume_yes)
+    if not proceed:
         sys.exit("Aborted by user.")
+    if assume_yes:
+        print("Proceeding (auto-accepted with --yes).")
 
     snv_rows, indel_rows = [], []
 
@@ -234,17 +231,14 @@ def run_pipeline(ref: Path, r1_glob_or_dir: str, outdir: Path, threads: int, plo
     # ------------------ Write outputs (CSV) ------------------
     ddir.mkdir(parents=True, exist_ok=True)
 
-    # Optional per-type CSVs (for QC/inspection)
     snv_csv   = ddir / "combined_snv_variants.csv"
     indel_csv = ddir / "combined_indels_variants.csv"
     snv_all.to_csv(snv_csv, index=False)
     indel_all.to_csv(indel_csv, index=False)
 
-    # REQUIRED: single combined CSV for dNdScv
     dndscv_csv = ddir / "dndscv_input.csv"
     dndscv_all.to_csv(dndscv_csv, index=False)
 
-    # Simple per-sample summary (CSV)
     summary_rows = []
     if not snv_all.empty:
         c = snv_all.groupby("sampleID").size().rename("n").reset_index()
@@ -275,14 +269,12 @@ def build_parser():
     p.add_argument("--non-interactive", action="store_true",
                    help="Run with provided flags only (no prompts).")
     p.add_argument("--yes", "--assume-yes", dest="assume_yes", action="store_true",
-                   help="Auto-accept prompts but still PRINT them (uniform screenshots).")
-
+                   help="Auto-accept Y/n confirmations but still ALLOW typing values.")
     # inputs / outputs
     p.add_argument("--ref", help="Path to reference FASTA")
     p.add_argument("--r1-source", default="*_R1.fastq.gz",
                    help="Directory OR glob for R1 FASTQs (e.g., '/data/cohort' or './demo_fastq/*_R1.fastq.gz').")
     p.add_argument("--outdir", default="results", help="Output directory (default: results)")
-
     # params
     p.add_argument("--threads", type=int, default=4, help="Threads (default: 4)")
     p.add_argument("--ploidy",  type=int, default=2, help="bcftools call ploidy (default: 2)")
@@ -309,62 +301,37 @@ def main():
             min_qual=args.min_qual,
             min_dp=args.min_dp,
             auto_index=args.auto_index,
-            assume_yes=True  # non-interactive: no prompts printed
+            assume_yes=True
         )
         return
 
-    # -------- INTERACTIVE-LOOK FLOW (works with or without --yes) --------
+    # -------- INTERACTIVE FLOW (typing allowed; tips printed) --------
     print("Accepted format for FASTQs is *_R1.fastq.gz and *_R2.fastq.gz")
     print("TIP: Reference FASTA path example: ./demo_ref/demo.fa")
     print("TIP: FASTQ glob (R1) example:      ./demo_fastq/*_R1.fastq.gz")
     print()
 
-    # Reference (path)
     wd = Path.cwd()
     default_ref = "./demo_ref/demo.fa" if (wd/"demo_ref"/"demo.fa").exists() else None
-    ref_input = prompt_value(
-        "Enter path to reference FASTA",
-        default=default_ref,
-        current=args.ref,
-        assume_yes=args.assume_yes
-    )
+
+    ref_input = prompt_value("Enter path to reference FASTA",
+                             default=default_ref, current=args.ref)
     ref_path = Path(ref_input).expanduser()
     if not ref_path.is_absolute():
         ref_path = (wd / ref_path)
     ref_path = ref_path.resolve()
 
-    # FASTQ source (dir or glob)
-    r1_source = prompt_value(
-        "FASTQ location (directory OR glob)",
-        default="*_R1.fastq.gz",
-        current=args.r1_source,
-        assume_yes=args.assume_yes
-    )
+    r1_source = prompt_value("FASTQ location (directory OR glob)",
+                             default="*_R1.fastq.gz", current=args.r1_source)
 
-    # Output dir
-    outdir_str = prompt_value(
-        "Choose output directory",
-        default=args.outdir,
-        current=args.outdir,
-        assume_yes=args.assume_yes
-    )
+    outdir_str = prompt_value("Choose output directory",
+                              default=args.outdir, current=args.outdir)
     outdir = Path(outdir_str)
 
-    # Threads / Ploidy
-    threads = prompt_value(
-        "Threads to use",
-        default=str(args.threads),
-        current=str(args.threads),
-        assume_yes=args.assume_yes,
-        cast=int
-    )
-    ploidy  = prompt_value(
-        "Ploidy for bcftools call",
-        default=str(args.ploidy),
-        current=str(args.ploidy),
-        assume_yes=args.assume_yes,
-        cast=int
-    )
+    threads = prompt_value("Threads to use",
+                           default=str(args.threads), current=str(args.threads), cast=int)
+    ploidy  = prompt_value("Ploidy for bcftools call",
+                           default=str(args.ploidy), current=str(args.ploidy), cast=int)
 
     run_pipeline(
         ref=ref_path,
