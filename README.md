@@ -1,7 +1,7 @@
 # dNdScv_prep
 
-[![Latest Release](https://img.shields.io/badge/release-v1.2.0-blue.svg)](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.0)
-[**Latest (v1.2.0) release notes →**](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.0)
+[![Latest Release](https://img.shields.io/badge/release-v1.2.1-blue.svg)](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.1)
+[**Latest (v1.2.1) release notes →**](https://github.com/samson-olofinsae/dNdScv_prep/releases/tag/v1.2.1)
 
 ### FASTQ → BAM → VCF → dNdScv Input (Container‑Ready Workflow)
 
@@ -9,12 +9,12 @@
 
 ## Overview
 
-**dNdScv_prep** is a lightweight, reproducible pipeline that automates generation of the `dNdScv_input.csv` file required by the [**dNdScv**](https://github.com/im3sanger/dndscv) R package developed by **Dr. Inigo Martincorena** (Wellcome Sanger Institute).
+**dNdScv_prep** is a lightweight, reproducible pipeline that automates generation of the `dNdScv_input.csv` file required by the [**dNdScv**](https://github.com/im3sanger/dndscv) R package developed by **Dr. Iñigo Martincorena** (Wellcome Sanger Institute).
 
-Our tool does **not** re‑implement dNdScv.  
-Instead, it **complements** it — automating upstream data‑processing steps and simplifying the workflow for postdocs, early‑career researchers, and clinicians who wish to run *dNdScv* reproducibly on their own datasets.
+Our tool does **not** re‑implement dNdScv.
+Instead, it **complements** it - automating upstream data‑processing steps and simplifying the workflow for postdocs, early‑career researchers, and clinicians who wish to run *dNdScv* reproducibly on their own datasets.
 
-> **Core Workflow:**  
+> **Core Workflow:**
 > FASTQ → BAM → VCF → Combined Variants → **dNdScv Input CSV**
 
 ### What does dNdScv do?
@@ -58,8 +58,10 @@ results_demo/
 
 ### 3) Run on real data (ignored by Git)
 ```bash
-python3 mutation-caller.py --ref user_ref/hg19.fa --r1-source "user_fastq/*_R1.fastq.gz" --outdir user_results --threads 8 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index --yes
+python3 mutation-caller.py --ref user_ref/<your_reference_file>.fa --r1-source "user_fastq/*_R1.fastq.gz" --outdir user_results --threads 8 --ploidy 2 --min-qual 20 --min-dp 10 --auto-index --yes
 ```
+
+> **Note:** Replace `<your_reference_file>` with your own reference FASTA filename (e.g. `hg19.fa`, `GRCh38.fa`, or `custom_ref.fa`).
 
 ---
 
@@ -107,6 +109,38 @@ Proceed with processing? [Y/n]: y
 
 ---
 
+## Example for New Users (Interactive Mode Explained)
+
+Running the pipeline interactively lets you enter information step by step.  
+Here’s what a *correct* session looks like:
+
+```
+Accepted format for FASTQs is *_R1.fastq.gz and *_R2.fastq.gz
+TIP: Reference FASTA path example: ./demo_ref/demo.fa
+TIP: FASTQ glob (R1) example:      ./demo_fastq/*_R1.fastq.gz
+
+Enter path to reference FASTA [user_ref/<your_reference_file>.fa]: ./user_ref/<your_reference_file>.fa
+FASTQ location (directory OR glob) [user_fastq/*_R1.fastq.gz]: ./user_fastq/*_R1.fastq.gz
+Choose output directory [user_results]: user_results
+```
+
+### Beginner Notes
+
+- Replace `<your_reference_file>` with the **actual name** of your FASTA file (e.g. `hg19.fa`, `GRCh38.fa`, or `my_sample.fa`).
+- Always start paths with `./` if your data is in the project folder.  
+  Example: `./user_ref/hg19_chr8.fa`  
+  Avoid: `user_ref/hg19_chr8.fa]` or `"./user_ref/hg19_chr8.fa"`  
+- Use **Tab autocompletion** in your terminal to fill in filenames automatically and avoid typing mistakes.
+- Do **not** include brackets (`[]`), quotes (`"`) or trailing characters (`]`) when entering paths.
+- Each prompt will show a **suggested default** in brackets. You can just press **Enter** to accept it or type a new value.
+
+> **Pro Tip:**  
+> If you are unsure about your file name, run  
+> `ls user_ref/`  
+> first to list all available FASTA files.
+
+---
+
 ## If your FASTA isn’t indexed (auto‑index)
 
 If the required index files for your reference FASTA (e.g. `demo.fa.bwt`, `demo.fa.fai`, `demo.fa.pac`, `demo.fa.ann`, `demo.fa.amb`, `demo.fa.sa`) are **missing**, you can auto‑generate them while keeping the rest of the run interactive:
@@ -115,7 +149,7 @@ If the required index files for your reference FASTA (e.g. `demo.fa.bwt`, `demo.
 python3 mutation-caller.py --auto-index --yes
 ```
 
-- `--auto-index` creates the **BWA** and **FASTA** indices on the fly, if absent.  
+- `--auto-index` creates the **BWA** and **FASTA** indices on the fly, if absent.
 - `--yes` auto‑accepts the yes/no confirmations so indexing proceeds, while still showing the normal prompts for paths and parameters.
 
 > **Note:** Generated index files can be large and are intentionally **gitignored**.
@@ -155,7 +189,7 @@ This layout allows reproducible demo runs while keeping real genomic data out of
 
 ## Containerisation
 
-The `environment.yml` file specifies all dependencies (`bwa`, `samtools`, `bcftools`, `pandas`, `python >= 3.9`).  
+The `environment.yml` file specifies all dependencies (`bwa`, `samtools`, `bcftools`, `pandas`, `python >= 3.9`).
 This environment can be exported to **Singularity** or **Docker** images for cross‑system reproducibility.
 
 Example:
@@ -186,13 +220,13 @@ R/demo/dndscv_demo_input.csv
 ## Acknowledgements
 
 Our collaborator and **dNdScv** creator  
-**Dr. Iñigo Martincorena**, PhD - Group Leader, Somatic Evolution Group, Wellcome Sanger Institute
+**Dr. Inigo Martincorena**, PhD — Group Leader, Somatic Evolution Group, Wellcome Sanger Institute
 
-Our mentors and collaborators
-- **Prof David Wedge** - Cancer Research UK Manchester Centre
-- **Prof Rosalind Eeles** - Institute of Cancer Research, UK
-- **Prof Daniel Brewer** - University of East Anglia
-- **Prof Colin Cooper** - University of East Anglia
+Our mentors and collaborators  
+- **Prof David Wedge** - Cancer Research UK Manchester Centre  
+- **Prof Rosalind Eeles** - Institute of Cancer Research, UK  
+- **Prof Daniel Brewer** - University of East Anglia  
+- **Prof Colin Cooper** - University of East Anglia  
 
 > This pipeline is a collaborative complement to *dNdScv*, designed to promote openness, reproducibility, and accessibility in somatic mutation research.
 
@@ -200,4 +234,4 @@ Our mentors and collaborators
 
 ## License
 
-This project is released under the **MIT License** - see [LICENSE](./LICENSE) for details.
+This project is released under the **MIT License** — see [LICENSE](./LICENSE) for details.
