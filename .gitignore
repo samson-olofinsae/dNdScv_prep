@@ -106,3 +106,11 @@ Thumbs.db
 *.swo
 .idea/
 .vscode/
+
+# 4b. FASTA index artifacts (BWA/samtools)
+*.amb
+*.ann
+*.bwt
+*.fai
+*.pac
+*.sa
