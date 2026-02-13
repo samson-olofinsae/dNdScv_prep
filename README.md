@@ -215,3 +215,16 @@ This project is released under the **MIT License** - see [LICENSE](./LICENSE) fo
 ---
 
 _Last updated: 2025-11-04_
+
+
+
+
+## Companion R analysis module (QC + visualisation + Shiny)
+
+For downstream QC plots, interactive dashboards, and **VCF → `dndscv_input.csv`** conversion (without Bioconductor IO issues), see:
+
+**dNdScv_R_analysis**  
+(VCF → QC tables/plots → Shiny → dNdScv input)  
+GitHub: https://github.com/samson-olofinsae/dNdScv_R_analysis
+
+Together, these two repositories provide an end-to-end reproducible somatic-mutation workflow from FASTQs to selection analysis readiness.
